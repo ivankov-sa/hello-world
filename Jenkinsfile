@@ -10,7 +10,7 @@ pipeline {
       stage("шаг 2") {
           steps {
               echo "hello 2"
-              sh "mkdir another-dir1"
+              sh "mkdir another-dir2"
               sh "ls -l"
               sh "pwd"
           }
