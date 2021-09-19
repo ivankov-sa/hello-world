@@ -1,0 +1,5 @@
+[nginx]
+10.128.0.25 ansible_user={{nstlr}} 
+10.128.0.25 ansible_user={{nstlr}} 
+
+[squid]
