@@ -1,8 +1,8 @@
 // withCredentials([string(credentialsId: 'MASTER_PASSWD_TO_EXEC_JOB', variable: 'test')]) {}
 
 pipeline {
-    //agent any
-    agent { label "backup" }
+    agent any
+    // agent { label "backup" }
     
     stages {
         stage("Проверка на мастер пароль") {
