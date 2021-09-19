@@ -1,0 +1,61 @@
+// withCredentials([string(credentialsId: 'MASTER_PASSWD_TO_EXEC_JOB', variable: 'test')]) {}
+
+pipeline {
+    //agent any
+    agent { label "backup" }
+    
+    stages {
+        stage("Проверка на мастер пароль") {
+            when {
+                expression { withCredentials([string(credentialsId: 'MASTER_PASSWD_TO_EXEC_JOB', variable: 'test')]) { MASTER_PASSWD != test } }
+            }
+            steps {
+                echo "##############\n Не верный масер пароль - отказат!!!\n###############"
+                sh 'exit 1'
+                
+            }
+        }
+        stage("Install pakege") {
+            when {
+                expression { env.aaction == 'add' && withCredentials([string(credentialsId: 'MASTER_PASSWD_TO_EXEC_JOB', variable: 'test')]) { MASTER_PASSWD == test }}
+            }
+            steps {
+                script {
+                    if ( env.ppakege == '' || env.ppakege.length() < 2  ) {
+                        echo "#############\n Пользователь не указан...${env.nname.length()}\n###########"
+                        sh 'exit 1'
+                    }
+                    if ( env.hhost == '' || env.hhost.length() < 3 ) {
+                        echo "#############\n HOST не указан...${env.hhost.length()}\n########## "
+                        sh 'exit 1'
+                    }
+                    echo "Test - ${hhost.toLowerCase()} ppakege=${ppakege.toLowerCase()}"
+                    // def HHHOST = hhost.toLowerCase();
+                    // def PPPAKEGE = ppakege.toLowerCase();
+                    sh '''ansible-playbook -i host.yml apt_add.yml --extra-vars "hhost=''' + hhost.toLowerCase() + ''' ppakege=''' + ppakege.toLowerCase() + '''" '''
+                }
+            }
+        }
+        stage("Delete pakege") {
+            when {
+                expression { env.aaction == 'delete'  && withCredentials([string(credentialsId: 'MASTER_PASSWD_TO_EXEC_JOB', variable: 'test')]) { MASTER_PASSWD == test } }
+            }
+            steps {
+                script {
+                    if ( env.ppakege == '' || env.ppakege.length() < 2 ) {
+                        echo "#############\n Пользователь не указан...${env.nname.length()}\n########## "
+                        sh 'exit 1'
+                    }
+                    if ( env.hhost == '' || env.hhost.length() < 3 ) {
+                        echo "#############\n HOST не указан...${env.hhost.length()}\n########## "
+                        sh 'exit 1'
+                    }
+                    // echo "Удаление пользователя ${BUILD_NUMBER} - ${aaction} - ${nname}"
+                    // sh 'ansible-playbook -i /etc/ansible/hosts /scripts/playbooks/servers/apt_del.yml --extra-vars "hhost=${hhost.toLowerCase()} ppakege=${ppakege.toLowerCase()}" '
+                    sh '''ansible-playbook -i /etc/ansible/hosts /scripts/playbooks/servers//apt_del.yml --extra-vars "hhost=''' + hhost.toLowerCase() + ''' ppakege=''' + ppakege.toLowerCase() + '''" '''
+                }
+            }
+        }
+        
+    }
+}

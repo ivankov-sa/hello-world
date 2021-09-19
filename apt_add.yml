@@ -1,0 +1,9 @@
+- hosts: "{{ hhost }}"
+  become: yes
+
+  tasks:
+  - name: "Install {{ ppakege }}"
+    package:
+      name: "{{ ppakege }}"
+      state: latest
+      update_cache: true
